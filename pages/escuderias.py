@@ -110,7 +110,7 @@ def cargar_datos_escuderias():
     
     ultima_temp = df['season'].max()
     equipos_activos = df[df['season'] >= (ultima_temp - 1)]['constructor_name'].unique()
-    df['estado_equipo'] = df['constructor_name'].apply(lambda x: 'Actual' if x in equipos_activos else 'Desaparecido / Histórico')
+    df['estado_equipo'] = df['constructor_name'].apply(lambda x: 'Actual' if x in equipos_activos else 'Inactiva')
     
     df_puntos = df[df['season'] >= 1958].groupby(['season', 'constructor_name'])['points'].sum().reset_index()
     if not df_puntos.empty:
@@ -119,21 +119,22 @@ def cargar_datos_escuderias():
     else:
         dict_campeones = {}
         
+    # CORRECCIÓN: Agrupamos y calculamos Grandes Premios únicos, no monoplazas.
     df_stats = df.groupby('constructor_name').agg(
         victorias=('finish_position_num', lambda x: (x == 1).sum()),
-        carreras=('round_number', 'count'),
+        carreras=('race_date', 'nunique'), # Aquí estaba el error
         debut=('season', 'min')
     ).reset_index()
     
     def clasificar_exito_estricto(row):
         if dict_campeones.get(row['constructor_name'], 0) > 0:
-            return '🏆 Leyendas (Campeones del Mundo)'
+            return '🏆 Campeones del Mundo'
         elif row['victorias'] > 0:
             return '🥇 Ganadores de Gran Premio'
         elif row['carreras'] >= 50:
-            return '🏎️ Clásicos de Zona Media (>50 GPs)'
+            return '🏎️ Escuderías Asentadas (>50 GPs)'
         else:
-            return '🔧 Equipos Fugaces / Privados (<50 GPs)'
+            return '🔧 Equipos Fugaces (<50 GPs)'
             
     df_stats['categoria_exito'] = df_stats.apply(clasificar_exito_estricto, axis=1)
     
