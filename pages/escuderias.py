@@ -25,7 +25,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- 2. DICCIONARIO DE COLORES DE ESCUDERÍAS ---
 colores_escuderias = {
     'Ferrari': '#FF2400', 'Alfa Romeo': '#D50000', 'Maserati': '#E53935',
     'Red Bull': '#1E88E5', 'Williams': '#00B0FF', 'Brabham': '#00E676',
@@ -119,7 +118,6 @@ def cargar_datos_escuderias():
     else:
         dict_campeones = {}
         
-    # CORRECCIÓN: Agrupamos y calculamos Grandes Premios únicos, no monoplazas.
     df_stats = df.groupby('constructor_name').agg(
         victorias=('finish_position_num', lambda x: (x == 1).sum()),
         carreras=('race_date', 'nunique'), # Aquí estaba el error
@@ -177,7 +175,6 @@ try:
     if st.session_state['filtro_est_eq'] != 'Todos':
         df_sidebar = df_sidebar[df_sidebar['estado_equipo'] == st.session_state['filtro_est_eq']]
         
-    # Selector Principal
     equipos_disponibles = sorted(df_sidebar['constructor_name'].dropna().unique())
     
     if equipos_disponibles:
@@ -202,7 +199,6 @@ try:
         df_eq = df_f1[df_f1['constructor_name'] == equipo_sel].sort_values('race_date')
         color_oficial = obtener_color_escuderia(equipo_sel)
         
-        # --- BLOQUE 1: LA FICHA DE LA ESCUDERÍA ---
         st.divider()
         col_img, col_info = st.columns([1, 2.5])
         
