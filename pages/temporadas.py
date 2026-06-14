@@ -273,21 +273,15 @@ try:
         
         if not df_eras.empty:
             df_eras = df_eras.sort_values('season') 
-            
-            df_eras['racha_id'] = (df_eras['campeon_constructor'] != df_eras['campeon_constructor'].shift()).cumsum()
-            
             primer_camp = df_eras.groupby('campeon_constructor')['season'].min().sort_values().index.tolist()
             mapa_colores_real = {esc: obtener_color_escuderia(esc) for esc in df_eras['campeon_constructor'].unique()}
             
             fig_hegemonia = px.line(
                 df_eras, x='season', y='campeon_constructor', color='campeon_constructor',
-                line_group='racha_id',
                 color_discrete_map=mapa_colores_real, markers=True,
                 labels={'season': 'Temporada', 'campeon_constructor': 'Escudería'}
             )
-            
-            # Reducimos el ancho de la línea de 4 a 2
-            fig_hegemonia.update_traces(line=dict(width=2), marker=dict(size=14, line=dict(width=1.5, color='DarkSlateGrey')))
+            fig_hegemonia.update_traces(line=dict(width=4), marker=dict(size=14, line=dict(width=1.5, color='DarkSlateGrey')))
             fig_hegemonia.update_yaxes(categoryorder='array', categoryarray=primer_camp)
             fig_hegemonia.update_layout(height=600, showlegend=False, margin=dict(l=0, r=0, t=30, b=0), xaxis=dict(tickmode='linear', dtick=4))
             fig_hegemonia.update_xaxes(showgrid=True, gridwidth=1, gridcolor='rgba(128, 128, 128, 0.2)')
